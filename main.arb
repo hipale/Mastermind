@@ -4,7 +4,8 @@ choice = gets.chomp
 class Player
   def make_code
     puts "Pick 4 numbers to be your code"
-    $code = gets.chomp.split
+    $code = gets.chomp.split("")
+    puts $code
   end
 
   def break_code
@@ -24,8 +25,11 @@ class Computer
   end
 
   def comp_break
-    for num in @code_arr
-      $code.scan(num)
+    puts @code_arr
+    0.upto(3) do |num|
+      if $code[num].to_i == @code_arr[num].to_i then print "!"
+      elsif $code.any? {|code| code == @code_arr[num] } == true then print"~"
+      else print"o" end
     end
   end
 end
@@ -33,5 +37,5 @@ end
 
 comp = Computer.new
 player = Player.new
-if choice.to_s == "maker" then player.make_code
+if choice.to_s == "maker" then player.make_code; comp.comp_break
 elsif choice.to_s == "breaker" then player.break_code end
