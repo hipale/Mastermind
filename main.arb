@@ -1,0 +1,37 @@
+puts"Would you like to be code maker or breaker"
+choice = gets.chomp
+
+class Player
+  def make_code
+    puts "Pick 4 numbers to be your code"
+    $code = gets.chomp.split
+  end
+
+  def break_code
+    puts "Try to break the code"
+    code_guess = gets.chomp.split
+  end
+end
+
+class Computer
+  def initialize
+    @code_arr = []
+    i = 0
+    while i < 4
+      @code_arr.push(rand(1..9))
+      i += 1
+    end
+  end
+
+  def comp_break
+    for num in @code_arr
+      $code.scan(num)
+    end
+  end
+end
+
+
+comp = Computer.new
+player = Player.new
+if choice.to_s == "maker" then player.make_code
+elsif choice.to_s == "breaker" then player.break_code end
