@@ -3,8 +3,8 @@ module BreakingCode
     @sign_arr = []
     0.upto(3) do |num|
       if code[num].to_i == guess[num].to_i then @sign_arr.push("!")
-      elsif code.none? {|try| try.to_i == guess[num].to_i } then @sign_arr.push("o")
-      else @sign_arr.push("~") end
+      elsif code.none? {|try| try.to_i == guess[num].to_i } then @sign_arr.push("_")
+      else @sign_arr.push("?") end
     end
     puts @sign_arr.join
   end
@@ -30,24 +30,25 @@ class Computer
   include BreakingCode
   def initialize
     $code_arr = []
-    
     i = 0
     @num_of_guesses = 0
-    while i < 4
-      $code_arr.push(rand(1..9)) 
-      i += 1
-    end
+    0.upto(3) {$code_arr.push(rand(1..9))}
   end
 
   def comp_cont_break
-      0.upto(3) do |num|
-        if @sign_arr[num] == "o" 
-          $code_arr[num] = rand(1..9)
-        elsif @sign_arr[num] == "~"
-        end
-      end
-      @num_of_guesses += 1
-      puts $code_arr.join
+    @index_arr = []
+    0.upto(3) do |num|
+      if @sign_arr[num] == "+_" then $code_arr[num] = rand(1..9) end
+    end
+    @sign_arr.each_with_index do |element, index| 
+      if element != "!" then @index_arr.push(index)end
+    end
+    @shuffled_arr = @index_arr.shuffle!
+    0.upto(@index_arr.length - 1) do |num|
+      $code_arr[@index_arr[num]] = $code_arr[@shuffled_arr[num]]
+    end
+    @num_of_guesses += 1
+    puts $code_arr.join
   end
 end
 
@@ -65,7 +66,7 @@ elsif choice.to_s == "breaker" then
   num_of_guesses = 0
   while $code_arr.join != $code_guess &&  num_of_guesses  < 12
     player.break_code 
-    player.code_break($code_arr, $code_guess.split("").to_i)
+    player.code_break($code_arr, $code_guess.split(""))
     num_of_guesses += 1
   end
 end
