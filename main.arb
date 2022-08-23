@@ -1,3 +1,15 @@
+module BreakingCode
+  def initialize
+    puts @code_arr.join
+    0.upto(3) do |num|
+      if $code[num].to_i == @code_arr[num].to_i then @sign_arr.push("!")
+      elsif $code.none? {|code| code.to_i == @code_arr[num].to_i } then @sign_arr.push("o")
+      else @sign_arr.push("~") end
+    end
+    puts @sign_arr.join
+  end
+end
+
 puts"Would you like to be code maker or breaker"
 choice = gets.chomp
 
@@ -5,7 +17,6 @@ class Player
   def make_code
     puts "Pick 4 numbers to be your code"
     $code = gets.chomp.split("")
-    puts $code
   end
 
   def break_code
@@ -15,27 +26,37 @@ class Player
 end
 
 class Computer
+  include BreakingCode
   def initialize
     @code_arr = []
+    @sign_arr = []
     i = 0
+    @num_of_guesses = 0
     while i < 4
-      @code_arr.push(rand(1..9))
+      @code_arr.push(rand(1..9)) 
       i += 1
     end
   end
 
   def comp_break
-    puts @code_arr
-    0.upto(3) do |num|
-      if $code[num].to_i == @code_arr[num].to_i then print "!"
-      elsif $code.any? {|code| code == @code_arr[num] } == true then print"~"
-      else print"o" end
+   
+  end
+
+  def comp_cont_break
+    while $code != @code_arr && @num_of_guesses  < 12
+      0.upto(3) do |num|
+        if @sign_arr[num] == "o" then @code_arr[num] = rand(1..9) end
+      end
+      @num_of_guesses += 1
+      puts @code_arr.join
     end
   end
 end
 
-
 comp = Computer.new
 player = Player.new
-if choice.to_s == "maker" then player.make_code; comp.comp_break
+if choice.to_s == "maker"
+  player.make_code
+  comp.comp_break 
+  comp.comp_cont_break
 elsif choice.to_s == "breaker" then player.break_code end
