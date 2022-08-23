@@ -1,9 +1,10 @@
 module BreakingCode
-  def initialize
-    puts @code_arr.join
+  def code_break (code, guess)
+    @sign_arr = []
+    puts guess.join
     0.upto(3) do |num|
-      if $code[num].to_i == @code_arr[num].to_i then @sign_arr.push("!")
-      elsif $code.none? {|code| code.to_i == @code_arr[num].to_i } then @sign_arr.push("o")
+      if code[num].to_i == guess[num].to_i then @sign_arr.push("!")
+      elsif code.none? {|try| try.to_i == guess[num].to_i } then @sign_arr.push("o")
       else @sign_arr.push("~") end
     end
     puts @sign_arr.join
@@ -14,6 +15,7 @@ puts"Would you like to be code maker or breaker"
 choice = gets.chomp
 
 class Player
+  include BreakingCode
   def make_code
     puts "Pick 4 numbers to be your code"
     $code = gets.chomp.split("")
@@ -21,34 +23,30 @@ class Player
 
   def break_code
     puts "Try to break the code"
-    code_guess = gets.chomp.split
+    $code_guess = gets.chomp
   end
 end
 
 class Computer
   include BreakingCode
   def initialize
-    @code_arr = []
-    @sign_arr = []
+    $code_arr = []
+    
     i = 0
     @num_of_guesses = 0
     while i < 4
-      @code_arr.push(rand(1..9)) 
+      $code_arr.push(rand(1..9)) 
       i += 1
     end
   end
 
-  def comp_break
-   
-  end
-
   def comp_cont_break
-    while $code != @code_arr && @num_of_guesses  < 12
+    while $code != $code_arr && @num_of_guesses  < 12
       0.upto(3) do |num|
-        if @sign_arr[num] == "o" then @code_arr[num] = rand(1..9) end
+        if @sign_arr[num] == "o" then $code_arr[num] = rand(1..9) end
       end
       @num_of_guesses += 1
-      puts @code_arr.join
+      puts $code_arr.join
     end
   end
 end
@@ -57,6 +55,13 @@ comp = Computer.new
 player = Player.new
 if choice.to_s == "maker"
   player.make_code
-  comp.comp_break 
+  comp.code_break($code, $code_arr)
   comp.comp_cont_break
-elsif choice.to_s == "breaker" then player.break_code end
+elsif choice.to_s == "breaker" then
+  num_of_guesses = 0
+  while $code_arr.join != $code_guess &&  num_of_guesses  < 12
+    player.break_code 
+    player.code_break($code_arr, $code_guess.split(""))
+    num_of_guesses += 1
+  end
+end
