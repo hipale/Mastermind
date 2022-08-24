@@ -29,29 +29,35 @@ end
 class Computer
   include BreakingCode
   def initialize
-    @is_changing == 0
+    @is_changing = 0
     $code_arr = []
-    @num_of_guesses = 0
+    @do_not_use_arr = []
     0.upto(3) {$code_arr.push(rand(1..9))}
   end
 
   def comp_cont_break
     @index_arr = []
     @sign_arr.each_with_index do |sign, inx| 
-      if sign == "_" then $code_arr[inx]  = rand(1..9) end
+      if sign == "_" 
+        @do_not_use_arr.push($code_arr[inx])
+        until @do_not_use_arr.any? {|wrong_num| wrong_num != $code_arr[inx]}
+          $code_arr[inx]  = rand(1..9) end
+      end
     end
     @sign_arr.each_with_index do |element, index| 
       if element != "!" then @index_arr.push(index)end
     end
     @shuffled_arr = @index_arr.shuffle
-    if @index_arr.length > 2
-      0.upto(@index_arr.length - 1) do |num|
+    if @index_arr.length > 2 && @is_changing < 4
+      0.upto(@index_arr.length - 1) do |num| 
         $code_arr[@index_arr[num]], $code_arr[@shuffled_arr[num]] = $code_arr[@shuffled_arr[num]], $code_arr[@index_arr[num]] 
+        @is_changing += 1
       end
-    elsif @index_arr.length == 2 && @is_changing == 3
+    elsif @index_arr.length == 2 && @is_changing < 4
       $code_arr[@index_arr[0]], $code_arr[@index_arr[1]] = $code_arr[@index_arr[1]], $code_arr[@index_arr[0]]
       @is_changing += 1
-    else $code_arr[@index_arr[0]] = rand(1..9) 
+    elsif @index_arr.length > 0
+      @index_arr.each {|num|$code_arr[num] = rand(1..9)}
       @is_changing = 0 end
     puts $code_arr.join
   end
