@@ -29,25 +29,30 @@ end
 class Computer
   include BreakingCode
   def initialize
+    @is_changing == 0
     $code_arr = []
-    i = 0
     @num_of_guesses = 0
     0.upto(3) {$code_arr.push(rand(1..9))}
   end
 
   def comp_cont_break
     @index_arr = []
-    0.upto(3) do |num|
-      if @sign_arr[num] == "+_" then $code_arr[num] = rand(1..9) end
+    @sign_arr.each_with_index do |sign, inx| 
+      if sign == "_" then $code_arr[inx]  = rand(1..9) end
     end
     @sign_arr.each_with_index do |element, index| 
       if element != "!" then @index_arr.push(index)end
     end
-    @shuffled_arr = @index_arr.shuffle!
-    0.upto(@index_arr.length - 1) do |num|
-      $code_arr[@index_arr[num]] = $code_arr[@shuffled_arr[num]]
-    end
-    @num_of_guesses += 1
+    @shuffled_arr = @index_arr.shuffle
+    if @index_arr.length > 2
+      0.upto(@index_arr.length - 1) do |num|
+        $code_arr[@index_arr[num]], $code_arr[@shuffled_arr[num]] = $code_arr[@shuffled_arr[num]], $code_arr[@index_arr[num]] 
+      end
+    elsif @index_arr.length == 2 && @is_changing == 3
+      $code_arr[@index_arr[0]], $code_arr[@index_arr[1]] = $code_arr[@index_arr[1]], $code_arr[@index_arr[0]]
+      @is_changing += 1
+    else $code_arr[@index_arr[0]] = rand(1..9) 
+      @is_changing = 0 end
     puts $code_arr.join
   end
 end
@@ -57,7 +62,7 @@ player = Player.new
 if choice.to_s == "maker"
   player.make_code
   num_of_guesses = 0
-  while $code != $code_arr &&  num_of_guesses  < 12
+  while $code != $code_arr.join &&  num_of_guesses  < 12
     comp.code_break($code, $code_arr)
     comp.comp_cont_break
     num_of_guesses += 1
