@@ -16,8 +16,11 @@ choice = gets.chomp
 class Player
   include BreakingCode
   def make_code
-    puts "Pick 4 numbers to be your code"
-    $code = gets.chomp.split("")
+    $code = [0, 0]
+    until $code.length == 4 && $code.all? {|elm| (1..9).cover? elm.to_i}
+      puts "Pick 4 numbers to be your code"
+      $code = gets.chomp.split("")
+    end
   end
 
   def break_code
@@ -48,16 +51,21 @@ class Computer
       if element != "!" then @index_arr.push(index)end
     end
     @shuffled_arr = @index_arr.shuffle
-    if @index_arr.length > 2 && @is_changing < 4
+    if @index_arr.length > 2 && @is_changing < 3
       0.upto(@index_arr.length - 1) do |num| 
         $code_arr[@index_arr[num]], $code_arr[@shuffled_arr[num]] = $code_arr[@shuffled_arr[num]], $code_arr[@index_arr[num]] 
         @is_changing += 1
       end
-    elsif @index_arr.length == 2 && @is_changing < 4
+    elsif @index_arr.length == 2 && @is_changing < 2
       $code_arr[@index_arr[0]], $code_arr[@index_arr[1]] = $code_arr[@index_arr[1]], $code_arr[@index_arr[0]]
       @is_changing += 1
     elsif @index_arr.length > 0
-      @index_arr.each {|num|$code_arr[num] = rand(1..9)}
+        @index_arr.each do |num| 
+          $code_arr[num] = rand(1..9)
+          while @do_not_use_arr.any? {|wrong_num| wrong_num == $code_arr[num]}
+          $code_arr[num] = rand(1..9)
+          end
+        end
       @is_changing = 0 end
     puts $code_arr.join
   end
@@ -68,7 +76,7 @@ player = Player.new
 if choice.to_s == "maker"
   player.make_code
   num_of_guesses = 0
-  while $code != $code_arr.join &&  num_of_guesses  < 12
+  while $code != $code_arr &&  num_of_guesses  < 12
     comp.code_break($code, $code_arr)
     comp.comp_cont_break
     num_of_guesses += 1
